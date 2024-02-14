@@ -1,8 +1,8 @@
 import math
 
+import cv2
 import numpy as np
 import torch
-from PIL import Image
 from torch.autograd import Variable
 
 from .box_utils import _preprocess, nms
@@ -15,7 +15,7 @@ def run_first_stage(image, net, scale, threshold):
     """Run P-Net, generate bounding boxes, and do NMS.
 
     Arguments:
-        image: an instance of PIL.Image.
+        image: an instance of NDArray.
         net: an instance of pytorch's nn.Module, P-Net.
         scale: a float number,
             scale width and height of the image by this number.
@@ -29,10 +29,10 @@ def run_first_stage(image, net, scale, threshold):
     """
 
     # scale the image and convert it to a float array
-    width, height = image.size
+    height, width = image.shape[:2]
     sw, sh = math.ceil(width * scale), math.ceil(height * scale)
-    img = image.resize((sw, sh), Image.BILINEAR)
-    img = np.asarray(img, 'float32')
+    img = cv2.resize(image, (sw, sh), interpolation=cv2.INTER_LINEAR)
+    img = img.astype(np.float32)
 
     img = torch.FloatTensor(_preprocess(img)).to(device)
     with torch.no_grad():

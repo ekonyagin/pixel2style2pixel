@@ -1,7 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
 
 
 # Log images
@@ -20,7 +19,7 @@ def tensor2im(var):
 	var[var < 0] = 0
 	var[var > 1] = 1
 	var = var * 255
-	return Image.fromarray(var.astype('uint8'))
+	return var.astype(np.uint8)
 
 
 def tensor2map(var):
@@ -29,15 +28,13 @@ def tensor2map(var):
 	mask_image = np.ones(shape=(mask.shape[0], mask.shape[1], 3))
 	for class_idx in np.unique(mask):
 		mask_image[mask == class_idx] = colors[class_idx]
-	mask_image = mask_image.astype('uint8')
-	return Image.fromarray(mask_image)
-
+	return mask_image.astype(np.uint8)
+	
 
 def tensor2sketch(var):
 	im = var[0].cpu().detach().numpy()
 	im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
-	im = (im * 255).astype(np.uint8)
-	return Image.fromarray(im)
+	return (im * 255).astype(np.uint8)
 
 
 # Visualization utils

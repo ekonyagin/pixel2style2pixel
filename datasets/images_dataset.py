@@ -1,10 +1,12 @@
-from PIL import Image
 from torch.utils.data import Dataset
 
+import cv2
 from utils import data_utils
 
 
 class ImagesDataset(Dataset):
+
+	TARGET_SIZE = 256
 
 	def __init__(self, source_root, target_root, opts, target_transform=None, source_transform=None):
 		self.source_paths = sorted(data_utils.make_dataset(source_root))
@@ -18,11 +20,16 @@ class ImagesDataset(Dataset):
 
 	def __getitem__(self, index):
 		from_path = self.source_paths[index]
-		from_im = Image.open(from_path)
-		from_im = from_im.convert('RGB') if self.opts.label_nc == 0 else from_im.convert('L')
+
+		from_im = cv2.imread(from_path)
+		from_im = cv2.cvtColor(from_im, cv2.COLOR_BGR2RGB)
+		from_im = cv2.resize(from_im, (self.TARGET_SIZE, self.TARGET_SIZE), interpolation=cv2.INTER_LINEAR)
 
 		to_path = self.target_paths[index]
-		to_im = Image.open(to_path).convert('RGB')
+
+		to_im = cv2.imread(to_path)
+		to_im = cv2.cvtColor(to_im, cv2.COLOR_BGR2RGB)
+		to_im = cv2.resize(to_im, (self.TARGET_SIZE, self.TARGET_SIZE), interpolation=cv2.INTER_LINEAR)
 		if self.target_transform:
 			to_im = self.target_transform(to_im)
 

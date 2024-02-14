@@ -2,7 +2,7 @@
 # encoding: utf-8
 import os
 
-from PIL import Image
+import cv2
 from torch.utils.data import Dataset
 
 
@@ -23,8 +23,11 @@ class GTResDataset(Dataset):
 
 	def __getitem__(self, index):
 		from_path, to_path, _ = self.pairs[index]
-		from_im = Image.open(from_path).convert('RGB')
-		to_im = Image.open(to_path).convert('RGB')
+		from_im = cv2.imread(from_path)
+		from_im = cv2.cvtColor(from_im, cv2.COLOR_BGR2RGB)
+		
+		to_im = cv2.imread(to_path)
+		to_im = cv2.cvtColor(to_im, cv2.COLOR_BGR2RGB)
 
 		if self.transform:
 			to_im = self.transform(to_im)

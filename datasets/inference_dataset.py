@@ -1,4 +1,4 @@
-from PIL import Image
+import cv2
 from torch.utils.data import Dataset
 
 from utils import data_utils
@@ -16,8 +16,9 @@ class InferenceDataset(Dataset):
 
 	def __getitem__(self, index):
 		from_path = self.paths[index]
-		from_im = Image.open(from_path)
-		from_im = from_im.convert('RGB') if self.opts.label_nc == 0 else from_im.convert('L')
+		from_im = cv2.imread(from_path)
+		from_im = cv2.cvtColor(from_im, cv2.COLOR_BGR2RGB)
+
 		if self.transform:
 			from_im = self.transform(from_im)
 		return from_im

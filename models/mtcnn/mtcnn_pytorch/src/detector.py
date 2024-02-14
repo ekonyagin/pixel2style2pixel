@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 import torch
 from torch.autograd import Variable
@@ -12,7 +13,7 @@ def detect_faces(image, min_face_size=20.0,
                  nms_thresholds=[0.7, 0.7, 0.7]):
     """
     Arguments:
-        image: an instance of PIL.Image.
+        image: an instance of NDArray.
         min_face_size: a float number.
         thresholds: a list of length 3.
         nms_thresholds: a list of length 3.
@@ -29,7 +30,7 @@ def detect_faces(image, min_face_size=20.0,
     onet.eval()
 
     # BUILD AN IMAGE PYRAMID
-    width, height = image.size
+    height, width = image.shape[:2]
     min_length = min(height, width)
 
     min_detection_size = 12

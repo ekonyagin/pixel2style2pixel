@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image
+import cv2
 
 from models.mtcnn.mtcnn_pytorch.src.align_trans import (
     get_reference_facial_points, warp_and_crop_face)
@@ -30,7 +30,7 @@ class MTCNN():
             return None, None
         facial5points = [[landmarks[0][j], landmarks[0][j + 5]] for j in range(5)]
         warped_face, tfm = warp_and_crop_face(np.array(img), facial5points, self.refrence, crop_size=(112, 112))
-        return Image.fromarray(warped_face), tfm
+        return warped_face, tfm
 
     def align_multi(self, img, limit=None, min_face_size=30.0):
         boxes, landmarks = self.detect_faces(img, min_face_size)
@@ -42,7 +42,7 @@ class MTCNN():
         for landmark in landmarks:
             facial5points = [[landmark[j], landmark[j + 5]] for j in range(5)]
             warped_face, tfm = warp_and_crop_face(np.array(img), facial5points, self.refrence, crop_size=(112, 112))
-            faces.append(Image.fromarray(warped_face))
+            faces.append(warped_face)
             tfms.append(tfm)
         return boxes, faces, tfms
 
@@ -51,7 +51,7 @@ class MTCNN():
                      nms_thresholds=[0.7, 0.7, 0.7]):
         """
         Arguments:
-            image: an instance of PIL.Image.
+            image: NDArray,
             min_face_size: a float number.
             thresholds: a list of length 3.
             nms_thresholds: a list of length 3.
@@ -62,7 +62,7 @@ class MTCNN():
         """
 
         # BUILD AN IMAGE PYRAMID
-        width, height = image.size
+        height, width = image.shape[:2]
         min_length = min(height, width)
 
         min_detection_size = 12

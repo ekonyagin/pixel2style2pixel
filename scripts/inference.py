@@ -3,9 +3,9 @@ import sys
 import time
 from argparse import Namespace
 
+import cv2
 import numpy as np
 import torch
-from PIL import Image
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -86,18 +86,26 @@ def run():
                 resize_amount = (256, 256) if opts.resize_outputs else (opts.output_size, opts.output_size)
                 if opts.resize_factors is not None:
                     # for super resolution, save the original, down-sampled, and output
-                    source = Image.open(im_path)
-                    res = np.concatenate([np.array(source.resize(resize_amount)),
-                                          np.array(input_im.resize(resize_amount, resample=Image.NEAREST)),
-                                          np.array(result.resize(resize_amount))], axis=1)
+                    source = cv2.imread(im_path)
+                    source = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
+                    res = np.concatenate([
+                        cv2.resize(source, resize_amount, interpolation=cv2.INTER_LINEAR),
+                        cv2.resize(input_im, resize_amount, interpolation=cv2.INTER_NEAREST),
+                        cv2.resize(result, resize_amount, interpolation=cv2.INTER_LINEAR),
+                    ], axis=1)
                 else:
                     # otherwise, save the original and output
-                    res = np.concatenate([np.array(input_im.resize(resize_amount)),
-                                          np.array(result.resize(resize_amount))], axis=1)
-                Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
+                    res = np.concatenate(
+                        [
+                            cv2.resize(input_im, resize_amount, interpolation=cv2.INTER_NEAREST),
+                            cv2.resize(result, resize_amount, interpolation=cv2.INTER_LINEAR)
+                        ],
+                        axis=1,
+                    )
+                cv2.imwrite(os.path.join(out_path_coupled, os.path.basename(im_path)), cv2.cvtColor(res, cv2.COLOR_RGB2BGR))
 
             im_save_path = os.path.join(out_path_results, os.path.basename(im_path))
-            Image.fromarray(np.array(result)).save(im_save_path)
+            cv2.imwrite(im_save_path, cv2.cvtColor(result, cv2.COLOR_RGB2BGR))
 
             global_i += 1
 

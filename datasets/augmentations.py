@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.typing import NDArray
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -6,7 +7,7 @@ from torchvision import transforms
 
 
 class ToOneHot(object):
-	""" Convert the input PIL image to a one-hot torch tensor """
+	""" Convert the input NDArray image to a one-hot torch tensor """
 	def __init__(self, n_classes=None):
 		self.n_classes = n_classes
 
@@ -22,8 +23,7 @@ class ToOneHot(object):
 		grid.insert(axis, idx)
 		return tuple(grid)
 
-	def __call__(self, img):
-		img = np.array(img)
+	def __call__(self, img: NDArray):
 		one_hot = self.onehot_initialization(img)
 		return one_hot
 
@@ -37,8 +37,8 @@ class BilinearResize(object):
 		D = BicubicDownSample(factor=factor, cuda=False)
 		img_tensor = transforms.ToTensor()(image).unsqueeze(0)
 		img_tensor_lr = D(img_tensor)[0].clamp(0, 1)
-		img_low_res = transforms.ToPILImage()(img_tensor_lr)
-		return img_low_res
+		
+		return img_res.cpu().numpy()
 
 
 class BicubicDownSample(nn.Module):
