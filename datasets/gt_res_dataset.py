@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # encoding: utf-8
 import os
-from torch.utils.data import Dataset
+
 from PIL import Image
+from torch.utils.data import Dataset
 
 
 class GTResDataset(Dataset):

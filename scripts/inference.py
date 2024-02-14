@@ -1,22 +1,22 @@
 import os
+import sys
+import time
 from argparse import Namespace
 
-from tqdm import tqdm
-import time
 import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import DataLoader
-import sys
+from tqdm import tqdm
 
 sys.path.append(".")
 sys.path.append("..")
 
 from configs import data_configs
 from datasets.inference_dataset import InferenceDataset
-from utils.common import tensor2im, log_input_image
-from options.test_options import TestOptions
 from models.psp import pSp
+from options.test_options import TestOptions
+from utils.common import log_input_image, tensor2im
 
 
 def run():
