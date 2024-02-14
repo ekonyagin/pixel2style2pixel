@@ -8,9 +8,12 @@ from .first_stage import run_first_stage
 from .get_nets import ONet, PNet, RNet
 
 
-def detect_faces(image, min_face_size=20.0,
-                 thresholds=[0.6, 0.7, 0.8],
-                 nms_thresholds=[0.7, 0.7, 0.7]):
+def detect_faces(
+    image,
+    min_face_size=20.0,
+    thresholds=[0.6, 0.7, 0.8],
+    nms_thresholds=[0.7, 0.7, 0.7],
+):
     """
     Arguments:
         image: an instance of NDArray.
@@ -47,7 +50,7 @@ def detect_faces(image, min_face_size=20.0,
 
     factor_count = 0
     while min_length > min_detection_size:
-        scales.append(m * factor ** factor_count)
+        scales.append(m * factor**factor_count)
         min_length *= factor
         factor_count += 1
 
@@ -117,11 +120,15 @@ def detect_faces(image, min_face_size=20.0,
         width = bounding_boxes[:, 2] - bounding_boxes[:, 0] + 1.0
         height = bounding_boxes[:, 3] - bounding_boxes[:, 1] + 1.0
         xmin, ymin = bounding_boxes[:, 0], bounding_boxes[:, 1]
-        landmarks[:, 0:5] = np.expand_dims(xmin, 1) + np.expand_dims(width, 1) * landmarks[:, 0:5]
-        landmarks[:, 5:10] = np.expand_dims(ymin, 1) + np.expand_dims(height, 1) * landmarks[:, 5:10]
+        landmarks[:, 0:5] = (
+            np.expand_dims(xmin, 1) + np.expand_dims(width, 1) * landmarks[:, 0:5]
+        )
+        landmarks[:, 5:10] = (
+            np.expand_dims(ymin, 1) + np.expand_dims(height, 1) * landmarks[:, 5:10]
+        )
 
         bounding_boxes = calibrate_box(bounding_boxes, offsets)
-        keep = nms(bounding_boxes, nms_thresholds[2], mode='min')
+        keep = nms(bounding_boxes, nms_thresholds[2], mode="min")
         bounding_boxes = bounding_boxes[keep]
         landmarks = landmarks[keep]
 
