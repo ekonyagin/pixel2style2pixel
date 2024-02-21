@@ -232,7 +232,6 @@ class Coach:
             loss_dict["id_improve"] = float(sim_improvement)
             loss = loss_id * self.opts.id_lambda
         if self.opts.l2_lambda > 0:
-            print('y hat shape:', y_hat.shape, 'y shape:', y.shape)
             loss_l2 = F.mse_loss(y_hat, y)
             loss_dict["loss_l2"] = float(loss_l2)
             loss += loss_l2 * self.opts.l2_lambda
