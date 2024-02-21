@@ -11,7 +11,6 @@ class MocoLoss(nn.Module):
         super(MocoLoss, self).__init__()
         print("Loading MOCO model from path: {}".format(model_paths["moco"]))
         self.model = self.__load_model()
-        self.model.cuda()
         self.model.eval()
 
     @staticmethod

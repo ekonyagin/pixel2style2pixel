@@ -23,16 +23,18 @@ def get_keys(d, name):
 
 
 class pSp(nn.Module):
+    _IMAGE_SIZE = (512, 512)
 
     def __init__(self, opts):
         super(pSp, self).__init__()
         self.set_opts(opts)
+        self.opts.device = "cpu"
         # compute number of style inputs based on the output resolution
         self.opts.n_styles = int(math.log(self.opts.output_size, 2)) * 2 - 2
         # Define architecture
         self.encoder = self.set_encoder()
         self.decoder = Generator(self.opts.output_size, 512, 8)
-        self.face_pool = torch.nn.AdaptiveAvgPool2d((256, 256))
+        self.face_pool = torch.nn.AdaptiveAvgPool2d(self._IMAGE_SIZE)
         # Load weights if needed
         self.load_weights()
 
@@ -130,7 +132,7 @@ class pSp(nn.Module):
 
     def __load_latent_avg(self, ckpt, repeat=None):
         if "latent_avg" in ckpt:
-            self.latent_avg = ckpt["latent_avg"].to(self.opts.device)
+            self.latent_avg = ckpt["latent_avg"].to("cpu")
             if repeat is not None:
                 self.latent_avg = self.latent_avg.repeat(repeat, 1)
         else:

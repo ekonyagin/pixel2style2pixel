@@ -26,15 +26,8 @@ class Coach:
 
         self.global_step = 0
 
-        self.device = (
-            "cuda:0"  # TODO: Allow multiple GPU? currently using CUDA_VISIBLE_DEVICES
-        )
+        self.device = "cuda:0"
         self.opts.device = self.device
-
-        if self.opts.use_wandb:
-            from utils.wandb_utils import WBLogger
-
-            self.wb_logger = WBLogger(self.opts)
 
         # Initialize network
         self.net = pSp(self.opts).to(self.device)
@@ -49,9 +42,9 @@ class Coach:
                 "Both ID and MoCo loss have lambdas > 0! Please select only one to have non-zero lambda!"
             )
 
-        self.mse_loss = nn.MSELoss().to(self.device).eval()
+        self.mse_loss = nn.MSELoss()
         if self.opts.lpips_lambda > 0:
-            self.lpips_loss = LPIPS(net_type="alex").to(self.device).eval()
+            self.lpips_loss = LPIPS(net_type="vgg").to(self.device).eval()
         if self.opts.id_lambda > 0:
             self.id_loss = id_loss.IDLoss().to(self.device).eval()
         if self.opts.w_norm_lambda > 0:
@@ -116,18 +109,6 @@ class Coach:
                     self.print_metrics(loss_dict, prefix="train")
                     self.log_metrics(loss_dict, prefix="train")
 
-                # Log images of first batch to wandb
-                if self.opts.use_wandb and batch_idx == 0:
-                    self.wb_logger.log_images_to_wandb(
-                        x,
-                        y,
-                        y_hat,
-                        id_logs,
-                        prefix="train",
-                        step=self.global_step,
-                        opts=self.opts,
-                    )
-
                 # Validation related
                 val_loss_dict = None
                 if (
@@ -179,18 +160,6 @@ class Coach:
                 subscript="{:04d}".format(batch_idx),
             )
 
-            # Log images of first batch to wandb
-            if self.opts.use_wandb and batch_idx == 0:
-                self.wb_logger.log_images_to_wandb(
-                    x,
-                    y,
-                    y_hat,
-                    id_logs,
-                    prefix="test",
-                    step=self.global_step,
-                    opts=self.opts,
-                )
-
             # For first step just do sanity test on small amount of data
             if self.global_step == 0 and batch_idx >= 4:
                 self.net.train()
@@ -213,8 +182,6 @@ class Coach:
                 f.write(
                     f"**Best**: Step - {self.global_step}, Loss - {self.best_val_loss} \n{loss_dict}\n"
                 )
-                if self.opts.use_wandb:
-                    self.wb_logger.log_best_model()
             else:
                 f.write(f"Step - {self.global_step}, \n{loss_dict}\n")
 
@@ -240,6 +207,7 @@ class Coach:
             source_transform=transforms_dict["transform_source"],
             target_transform=transforms_dict["transform_gt_train"],
             opts=self.opts,
+            target_size=512,
         )
         test_dataset = ImagesDataset(
             source_root=dataset_args["test_source_root"],
@@ -247,10 +215,9 @@ class Coach:
             source_transform=transforms_dict["transform_source"],
             target_transform=transforms_dict["transform_test"],
             opts=self.opts,
+            target_size=512,
         )
-        if self.opts.use_wandb:
-            self.wb_logger.log_dataset_wandb(train_dataset, dataset_name="Train")
-            self.wb_logger.log_dataset_wandb(test_dataset, dataset_name="Test")
+
         print(f"Number of training samples: {len(train_dataset)}")
         print(f"Number of test samples: {len(test_dataset)}")
         return train_dataset, test_dataset
@@ -272,27 +239,10 @@ class Coach:
             loss_lpips = self.lpips_loss(y_hat, y)
             loss_dict["loss_lpips"] = float(loss_lpips)
             loss += loss_lpips * self.opts.lpips_lambda
-        if self.opts.lpips_lambda_crop > 0:
-            loss_lpips_crop = self.lpips_loss(
-                y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220]
-            )
-            loss_dict["loss_lpips_crop"] = float(loss_lpips_crop)
-            loss += loss_lpips_crop * self.opts.lpips_lambda_crop
-        if self.opts.l2_lambda_crop > 0:
-            loss_l2_crop = F.mse_loss(
-                y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220]
-            )
-            loss_dict["loss_l2_crop"] = float(loss_l2_crop)
-            loss += loss_l2_crop * self.opts.l2_lambda_crop
         if self.opts.w_norm_lambda > 0:
             loss_w_norm = self.w_norm_loss(latent, self.net.latent_avg)
             loss_dict["loss_w_norm"] = float(loss_w_norm)
             loss += loss_w_norm * self.opts.w_norm_lambda
-        if self.opts.moco_lambda > 0:
-            loss_moco, sim_improvement, id_logs = self.moco_loss(y_hat, y, x)
-            loss_dict["loss_moco"] = float(loss_moco)
-            loss_dict["id_improve"] = float(sim_improvement)
-            loss += loss_moco * self.opts.moco_lambda
 
         loss_dict["loss"] = float(loss)
         return loss, loss_dict, id_logs
@@ -300,8 +250,6 @@ class Coach:
     def log_metrics(self, metrics_dict, prefix):
         for key, value in metrics_dict.items():
             self.logger.add_scalar(f"{prefix}/{key}", value, self.global_step)
-        if self.opts.use_wandb:
-            self.wb_logger.log(prefix, metrics_dict, self.global_step)
 
     def print_metrics(self, metrics_dict, prefix):
         print(f"Metrics for {prefix}, step {self.global_step}")

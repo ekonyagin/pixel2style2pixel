@@ -26,20 +26,20 @@ class EncodeTransforms(TransformsConfig):
                 [
                     transforms.ToTensor(),
                     transforms.RandomHorizontalFlip(0.5),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_source": None,
             "transform_test": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_inference": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
         }
@@ -57,26 +57,26 @@ class FrontalizationTransforms(TransformsConfig):
                 [
                     transforms.ToTensor(),
                     transforms.RandomHorizontalFlip(0.5),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_source": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                     transforms.RandomHorizontalFlip(0.5),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.RandomHorizontalFlip(0.5),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_test": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_inference": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
         }
@@ -93,14 +93,14 @@ class SketchToImageTransforms(TransformsConfig):
             "transform_gt_train": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_source": transforms.Compose([transforms.ToTensor()]),
             "transform_test": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_inference": transforms.Compose([transforms.ToTensor()]),
@@ -118,7 +118,7 @@ class SegToImageTransforms(TransformsConfig):
             "transform_gt_train": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_source": transforms.Compose(
@@ -127,7 +127,7 @@ class SegToImageTransforms(TransformsConfig):
             "transform_test": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_inference": transforms.Compose(
@@ -151,20 +151,20 @@ class SuperResTransforms(TransformsConfig):
             "transform_gt_train": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_source": transforms.Compose(
                 [
                     augmentations.BilinearResize(factors=factors),
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_test": transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
             "transform_inference": transforms.Compose(
@@ -172,7 +172,7 @@ class SuperResTransforms(TransformsConfig):
                     augmentations.BilinearResize(factors=factors),
                     transforms.Resize((256, 256)),
                     transforms.ToTensor(),
-                    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]
             ),
         }
