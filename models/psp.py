@@ -98,7 +98,7 @@ class pSp(nn.Module):
                     codes = codes + self.latent_avg.repeat(codes.shape[0], 1)
                 else:
                     codes = codes + self.latent_avg.repeat(codes.shape[0], 1, 1)
-
+        print('codes shape is:', codes.shape)
         if latent_mask is not None:
             for i in latent_mask:
                 if inject_latent is not None:
