@@ -28,7 +28,7 @@ class pSp(nn.Module):
     def __init__(self, opts):
         super(pSp, self).__init__()
         self.set_opts(opts)
-        self.opts.device = "cpu"
+        self.opts.device = "cuda"
         # compute number of style inputs based on the output resolution
         self.opts.n_styles = int(math.log(self.opts.output_size, 2)) * 2 - 2
         # Define architecture
@@ -132,7 +132,7 @@ class pSp(nn.Module):
 
     def __load_latent_avg(self, ckpt, repeat=None):
         if "latent_avg" in ckpt:
-            self.latent_avg = ckpt["latent_avg"].to("cpu")
+            self.latent_avg = ckpt["latent_avg"].to(self.opts.device)
             if repeat is not None:
                 self.latent_avg = self.latent_avg.repeat(repeat, 1)
         else:
