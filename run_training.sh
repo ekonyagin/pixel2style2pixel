@@ -1,0 +1,15 @@
+python scripts/train.py \
+--dataset_type=ffhq_encode \
+--exp_dir=images_512_512_upd \
+--workers=16 \
+--batch_size=16 \
+--test_batch_size=8 \
+--test_workers=8 \
+--val_interval=2500 \
+--save_interval=5000 \
+--encoder_type=GradualStyleEncoder \
+--start_from_latent_avg \
+--lpips_lambda=0.8 \
+--l2_lambda=1 \
+--id_lambda=0.1 \
+--checkpoint_path=images_512_512/checkpoints/iteration_60000.pt
